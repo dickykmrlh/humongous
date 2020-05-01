@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/dickymrlh/humongous/domain/town"
@@ -14,25 +15,24 @@ func main() {
 
 	t := []town.Town{
 		town.Town{
-			Name:       "Punxsutawney",
-			Population: 6200,
-			LastCensus: time.Date(2016, 1, 31, 0, 0, 0, 0, time.Local),
-			FamousFor:  []string{"Punxsutawney Phil"},
-			Mayor:      town.Politican{Name: "Richard Alexander"},
-		},
-		town.Town{
-			Name:       "Portland",
-			Population: 582000,
-			LastCensus: time.Date(2016, 9, 20, 0, 0, 0, 0, time.Local),
-			FamousFor:  []string{"berr", "food", "Portlandia"},
-			Mayor:      town.Politican{Name: "Ted Wheeler", Party: "D"},
+			Name:       "Oakland",
+			Population: 390724,
+			LastCensus: time.Date(2020, 5, 1, 0, 0, 0, 0, time.Local),
+			FamousFor:  []string{"Fried chicken", "Mahershala Ali"},
+			Mayor:      town.Politican{Name: "Libby Schaaf "},
 		},
 	}
-
-	id, err := c.Insert(ctx, t)
+	var wg sync.WaitGroup
+	var id []string
+	var err error
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		id, err = c.Insert(ctx, t)
+	}()
+	wg.Wait()
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Println(id)
 }

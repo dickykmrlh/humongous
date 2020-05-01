@@ -49,20 +49,28 @@ func GetInstance(ctx context.Context) *Collection {
 
 func (c *Collection) Insert(ctx context.Context, towns []Town) ([]string, error) {
 
-	var townsInterface []interface{}
-	for _, t := range towns {
-		townsInterface = append(townsInterface, t)
+	if len(towns) > 1 {
+		var townsInterface []interface{}
+		for _, t := range towns {
+			townsInterface = append(townsInterface, t)
+		}
+
+		resultMany, err := c.m.InsertMany(ctx, townsInterface)
+		if err != nil {
+			return nil, err
+		}
+
+		var ids []string
+		for _, id := range resultMany.InsertedIDs {
+			ids = append(ids, fmt.Sprintf("%v", id))
+		}
+
+		return ids, nil
 	}
 
-	result, err := c.m.InsertMany(ctx, townsInterface)
+	resultOne, err := c.m.InsertOne(ctx, towns[0])
 	if err != nil {
 		return nil, err
 	}
-
-	var ids []string
-	for _, id := range result.InsertedIDs {
-		ids = append(ids, fmt.Sprintf("%v", id))
-	}
-
-	return ids, nil
+	return []string{fmt.Sprintf("%v", resultOne.InsertedID)}, nil
 }
