@@ -6,31 +6,33 @@ import (
 	"time"
 
 	"github.com/dickymrlh/humongous/domain/town"
-	t "github.com/dickymrlh/humongous/usecase/town"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func main() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	c := town.GetInstance(ctx)
 
-	town := t.Town{
-		Name:       "New York",
-		Population: 22200000,
-		LastCensus: time.Date(2016, 7, 1, 0, 0, 0, 0, time.Local),
-		FamousFor:  []string{"the MOMA", "food", "Derek Jeter"},
-		Mayor:      t.Politican{Name: "Bill de Blasio", Party: "I"},
+	t := []town.Town{
+		town.Town{
+			Name:       "Punxsutawney",
+			Population: 6200,
+			LastCensus: time.Date(2016, 1, 31, 0, 0, 0, 0, time.Local),
+			FamousFor:  []string{"Punxsutawney Phil"},
+			Mayor:      town.Politican{Name: "Richard Alexander"},
+		},
+		town.Town{
+			Name:       "Portland",
+			Population: 582000,
+			LastCensus: time.Date(2016, 9, 20, 0, 0, 0, 0, time.Local),
+			FamousFor:  []string{"berr", "food", "Portlandia"},
+			Mayor:      town.Politican{Name: "Ted Wheeler", Party: "D"},
+		},
 	}
 
-	data, err := bson.Marshal(town)
+	id, err := c.Insert(ctx, t)
 	if err != nil {
 		panic(err)
 	}
 
-	result, err := c.Mc.InsertOne(ctx, data)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(result.InsertedID)
-
+	fmt.Println(id)
 }
