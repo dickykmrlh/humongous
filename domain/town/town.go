@@ -8,14 +8,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type TownCollection struct {
-	c *mongo.Collection
+type Collection struct {
+	Mc *mongo.Collection
 }
 
-var townCollection *TownCollection
+var c *Collection
 
-func GetInstance(ctx context.Context) *TownCollection {
-	if townCollection == nil {
+func GetInstance(ctx context.Context) *Collection {
+	if c == nil {
 		client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 		if err != nil {
 			log.Fatal(err)
@@ -26,8 +26,8 @@ func GetInstance(ctx context.Context) *TownCollection {
 		}
 
 		db := client.Database("world")
-		collection := db.Collection("town")
-		townCollection = &TownCollection{c: collection}
+		collection := db.Collection("towns")
+		c = &Collection{Mc: collection}
 	}
-	return townCollection
+	return c
 }
