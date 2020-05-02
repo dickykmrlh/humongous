@@ -23,14 +23,14 @@ type Politican struct {
 	Party string
 }
 
-type Collection struct {
-	m *mongo.Collection
+type TownCollection struct {
+	c *mongo.Collection
 }
 
-var c *Collection
+var townCollection *TownCollection
 
-func GetInstance(ctx context.Context) *Collection {
-	if c == nil {
+func GetInstance(ctx context.Context) *TownCollection {
+	if townCollection == nil {
 		client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 		if err != nil {
 			log.Fatal(err)
@@ -42,12 +42,12 @@ func GetInstance(ctx context.Context) *Collection {
 
 		db := client.Database("world")
 		collection := db.Collection("towns")
-		c = &Collection{m: collection}
+		townCollection = &TownCollection{c: collection}
 	}
-	return c
+	return townCollection
 }
 
-func (c *Collection) Insert(ctx context.Context, towns []Town) ([]string, error) {
+func (t *TownCollection) Insert(ctx context.Context, towns []Town) ([]string, error) {
 
 	if len(towns) > 1 {
 		var townsInterface []interface{}
@@ -55,7 +55,7 @@ func (c *Collection) Insert(ctx context.Context, towns []Town) ([]string, error)
 			townsInterface = append(townsInterface, t)
 		}
 
-		resultMany, err := c.m.InsertMany(ctx, townsInterface)
+		resultMany, err := t.c.InsertMany(ctx, townsInterface)
 		if err != nil {
 			return nil, err
 		}
@@ -68,9 +68,11 @@ func (c *Collection) Insert(ctx context.Context, towns []Town) ([]string, error)
 		return ids, nil
 	}
 
-	resultOne, err := c.m.InsertOne(ctx, towns[0])
+	resultOne, err := t.c.InsertOne(ctx, towns[0])
 	if err != nil {
 		return nil, err
 	}
 	return []string{fmt.Sprintf("%v", resultOne.InsertedID)}, nil
 }
+
+//func (t *TownCollection) Find()
