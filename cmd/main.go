@@ -25,7 +25,7 @@ func main() {
 
 func InsertTown(c *town.TownCollection) {
 
-	if isDataAlreadyExist(c) {
+	if isDocumentAlreadyExist(c) {
 		return
 	}
 
@@ -68,7 +68,7 @@ func InsertTown(c *town.TownCollection) {
 	fmt.Println(id)
 }
 
-func isDataAlreadyExist(c *town.TownCollection) bool {
+func isDocumentAlreadyExist(c *town.TownCollection) bool {
 	towns, find_err := c.Find()
 	if find_err != nil {
 		panic(find_err)
