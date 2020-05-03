@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/dickymrlh/humongous/domain/town"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
@@ -15,12 +17,25 @@ func main() {
 
 	InsertTown(c)
 
+	opt := options.Find()
 	// find all
-	towns, err := c.Find()
+	towns, err := c.Find(opt)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(towns)
+	fmt.Println("=====================================")
+
+	// find with limit and sort
+	opt.SetLimit(2)
+	opt.SetSort(bson.D{{"population", 1}})
+	towns, err = c.Find(opt)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(towns)
+	fmt.Println("=====================================")
+
 }
 
 func InsertTown(c *town.TownCollection) {
@@ -69,7 +84,7 @@ func InsertTown(c *town.TownCollection) {
 }
 
 func isDocumentAlreadyExist(c *town.TownCollection) bool {
-	towns, find_err := c.Find()
+	towns, find_err := c.Find(options.Find())
 	if find_err != nil {
 		panic(find_err)
 	}

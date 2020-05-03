@@ -77,8 +77,8 @@ func (t *TownCollection) InsertOne(town Town) (string, error) {
 	return fmt.Sprintf("%v", resultOne.InsertedID), nil
 }
 
-func (t *TownCollection) Find() ([]Town, error) {
-	cur, err := t.c.Find(t.ctx, bson.D{{}}, options.Find())
+func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
+	cur, err := t.c.Find(t.ctx, bson.D{{}}, opt)
 	if err != nil {
 		return nil, err
 	}
