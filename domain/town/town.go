@@ -2,11 +2,11 @@ package town
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -56,25 +56,27 @@ func (t *TownCollection) InsertMany(towns []Town) ([]string, error) {
 		townsInterface = append(townsInterface, t)
 	}
 
-	resultMany, err := t.c.InsertMany(t.ctx, townsInterface)
+	result, err := t.c.InsertMany(t.ctx, townsInterface)
 	if err != nil {
 		return nil, err
 	}
 
 	var ids []string
-	for _, id := range resultMany.InsertedIDs {
-		ids = append(ids, fmt.Sprintf("%v", id))
+	for _, id := range result.InsertedIDs {
+		objectID, _ := id.(primitive.ObjectID)
+		ids = append(ids, objectID.Hex())
 	}
 
 	return ids, nil
 }
 
 func (t *TownCollection) InsertOne(town Town) (string, error) {
-	resultOne, err := t.c.InsertOne(t.ctx, town)
+	result, err := t.c.InsertOne(t.ctx, town)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%v", resultOne.InsertedID), nil
+	objectID, _ := result.InsertedID.(primitive.ObjectID)
+	return objectID.Hex(), nil
 }
 
 func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
@@ -101,4 +103,13 @@ func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
 	}
 
 	return results, nil
+}
+
+func (t *TownCollection) FindOne(filter interface{}) (Town, error) {
+	var result Town
+	err := t.c.FindOne(t.ctx, filter).Decode(&result)
+	if err != nil {
+		return Town{}, err
+	}
+	return result, nil
 }

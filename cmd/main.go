@@ -8,6 +8,7 @@ import (
 
 	"github.com/dickymrlh/humongous/domain/town"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -15,7 +16,10 @@ func main() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	c := town.GetInstance(ctx)
 
-	InsertTown(c)
+	ids, err := InsertTown(c)
+	if err != nil {
+		panic(err)
+	}
 
 	opt := options.Find()
 	// find all
@@ -36,9 +40,19 @@ func main() {
 	fmt.Println(towns)
 	fmt.Println("=====================================")
 
+	// find One with object ID
+	objID, err := primitive.ObjectIDFromHex(ids[1])
+	if err != nil {
+		panic(err)
+	}
+	town, err := c.FindOne(bson.D{{"_id", objID}})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(town)
 }
 
-func InsertTown(c *town.TownCollection) {
+func InsertTown(c *town.TownCollection) (ids []string, err error) {
 
 	if isDocumentAlreadyExist(c) {
 		return
@@ -69,18 +83,17 @@ func InsertTown(c *town.TownCollection) {
 	}
 
 	var wg sync.WaitGroup
-	var id []string
-	var err error
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		id, err = c.InsertMany(towns)
+		ids, err = c.InsertMany(towns)
 	}()
 	wg.Wait()
 	if err != nil {
-		panic(err)
+		return
 	}
-	fmt.Println(id)
+
+	return
 }
 
 func isDocumentAlreadyExist(c *town.TownCollection) bool {
