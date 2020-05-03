@@ -37,6 +37,10 @@ func PlayAroundWithTown(townCollection *town.TownCollection) {
 	fmt.Println(towns)
 	fmt.Println("=====================================")
 
+	if ids == nil {
+		return
+	}
+
 	// find One with object ID
 	objID, err := primitive.ObjectIDFromHex(ids[1])
 	if err != nil {
