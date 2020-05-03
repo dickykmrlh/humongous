@@ -59,6 +59,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// find One With population in range
+	// $lt = less than
+	// $gt = greater than
+	findOne.SetProjection(bson.D{{"name", 1}, {"population", 1}})
+	town, err = c.FindOne(bson.M{
+		"population": bson.M{
+			"$lt": 1000000,
+			"$gt": 10000,
+		},
+	}, findOne)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(town)
 
 }
