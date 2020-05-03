@@ -34,6 +34,20 @@ func PlayAroundWithCountry(countriesCollection *country.CountriesCollection) {
 	fmt.Println()
 	fmt.Println("###################################################################################")
 
+	// find With or
+	countries, err = countriesCollection.Find(bson.M{
+		"$or": []bson.M{
+			bson.M{"_id": "mx"},
+			bson.M{"name": "United States"},
+		},
+	}, options.Find().SetProjection(bson.D{{"_id", 1}}))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(countries)
+	fmt.Println()
+	fmt.Println("###################################################################################")
+
 }
 
 func InsertTown(countriesCollection *country.CountriesCollection) error {
