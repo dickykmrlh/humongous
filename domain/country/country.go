@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -16,8 +15,9 @@ type Country struct {
 }
 
 type Export struct {
-	Name  string
-	Tasty bool
+	Name      string
+	Tasty     bool
+	Condiment bool
 }
 
 type CountriesCollection struct {
@@ -35,34 +35,27 @@ func GetInstance(ctx context.Context, db *mongo.Database) *CountriesCollection {
 	return countriesCollection
 }
 
-func (c *CountriesCollection) InsertMany(countries []Country) ([]string, error) {
+func (c *CountriesCollection) InsertMany(countries []Country) error {
 
 	var townsInterface []interface{}
 	for _, t := range countries {
 		townsInterface = append(townsInterface, t)
 	}
 
-	result, err := c.collection.InsertMany(c.ctx, townsInterface)
+	_, err := c.collection.InsertMany(c.ctx, townsInterface)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var ids []string
-	for _, id := range result.InsertedIDs {
-		objectID, _ := id.(primitive.ObjectID)
-		ids = append(ids, objectID.Hex())
-	}
-
-	return ids, nil
+	return nil
 }
 
-func (c *CountriesCollection) InsertOne(country Country) (string, error) {
-	result, err := c.collection.InsertOne(c.ctx, country)
+func (c *CountriesCollection) InsertOne(country Country) error {
+	_, err := c.collection.InsertOne(c.ctx, country)
 	if err != nil {
-		return "", err
+		return err
 	}
-	objectID, _ := result.InsertedID.(primitive.ObjectID)
-	return objectID.Hex(), nil
+	return nil
 }
 
 func (c *CountriesCollection) Find(opt *options.FindOptions) ([]Country, error) {

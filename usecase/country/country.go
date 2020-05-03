@@ -10,11 +10,10 @@ import (
 
 func PlayAroundWithCountry(countriesCollection *country.CountriesCollection) {
 	fmt.Println("###################################################################################")
-	ids, err := InsertTown(countriesCollection)
+	err := InsertTown(countriesCollection)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(ids)
 	/*
 		opt := options.Find()
 		// find all
@@ -83,26 +82,51 @@ func PlayAroundWithCountry(countriesCollection *country.CountriesCollection) {
 	*/
 }
 
-func InsertTown(countriesCollection *country.CountriesCollection) (ids []string, err error) {
+func InsertTown(countriesCollection *country.CountriesCollection) error {
 
 	if isDocumentAlreadyExist(countriesCollection) {
-		return
+		return nil
 	}
 
-	countries := []country.Country{}
+	countries := []country.Country{
+		country.Country{
+			ID:   "us",
+			Name: "United States",
+			Exports: []country.Export{
+				{Name: "bacon", Tasty: true},
+				{Name: "burgers"},
+			},
+		},
+		country.Country{
+			ID:   "ca",
+			Name: "Canada",
+			Exports: []country.Export{
+				{Name: "bacon", Tasty: false},
+				{Name: "syrup", Tasty: true},
+			},
+		},
+		country.Country{
+			ID:   "mx",
+			Name: "Mexico",
+			Exports: []country.Export{
+				{Name: "salsa", Tasty: false, Condiment: true},
+			},
+		},
+	}
 
 	var wg sync.WaitGroup
+	var err error
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		ids, err = countriesCollection.InsertMany(countries)
+		err = countriesCollection.InsertMany(countries)
 	}()
 	wg.Wait()
 	if err != nil {
-		return
+		return err
 	}
 
-	return
+	return nil
 }
 
 func isDocumentAlreadyExist(countriesCollection *country.CountriesCollection) bool {
