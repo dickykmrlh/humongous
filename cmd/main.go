@@ -6,9 +6,7 @@ import (
 	"time"
 
 	"github.com/dickymrlh/humongous/domain/country"
-	"github.com/dickymrlh/humongous/domain/town"
 	c "github.com/dickymrlh/humongous/usecase/country"
-	t "github.com/dickymrlh/humongous/usecase/town"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -25,8 +23,8 @@ func main() {
 	}
 	db := client.Database("world")
 
-	townCollection := town.GetInstance(ctx, db)
-	t.PlayAroundWithTown(townCollection)
+	//townCollection := town.GetInstance(ctx, db)
+	//t.PlayAroundWithTown(townCollection)
 	countriesCollection := country.GetInstance(ctx, db)
 	c.PlayAroundWithCountry(countriesCollection)
 }

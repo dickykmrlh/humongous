@@ -3,21 +3,24 @@ package country
 import (
 	"context"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Country struct {
-	ID      string   `bson:"_id"`
-	Name    string   `bson:"name"`
-	Exports []Export `bson:"exports"`
+	ID      string `bson:"_id"`
+	Name    string `bson:"name"`
+	Exports Export `bson:"exports"`
 }
 
 type Export struct {
-	Name      string
-	Tasty     bool
-	Condiment bool
+	Foods []Food `bson:"foods"`
+}
+
+type Food struct {
+	Name      string `bson:"name"`
+	Tasty     bool   `bson:"tasty"`
+	Condiment bool   `bson:"condiment"`
 }
 
 type CountriesCollection struct {
@@ -58,8 +61,8 @@ func (c *CountriesCollection) InsertOne(country Country) error {
 	return nil
 }
 
-func (c *CountriesCollection) Find(opt *options.FindOptions) ([]Country, error) {
-	cur, err := c.collection.Find(c.ctx, bson.M{}, opt)
+func (c *CountriesCollection) Find(filter interface{}, opt *options.FindOptions) ([]Country, error) {
+	cur, err := c.collection.Find(c.ctx, filter, opt)
 	if err != nil {
 		return nil, err
 	}
