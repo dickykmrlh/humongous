@@ -43,7 +43,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		id, err = c.Insert(ctx, t)
+		id, err = c.InsertMany(ctx, t)
 	}()
 	wg.Wait()
 	if err != nil {

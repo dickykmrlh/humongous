@@ -47,32 +47,68 @@ func GetInstance(ctx context.Context) *TownCollection {
 	return townCollection
 }
 
-func (t *TownCollection) Insert(ctx context.Context, towns []Town) ([]string, error) {
+func (t *TownCollection) InsertMany(ctx context.Context, towns []Town) ([]string, error) {
 
-	if len(towns) > 1 {
-		var townsInterface []interface{}
-		for _, t := range towns {
-			townsInterface = append(townsInterface, t)
-		}
-
-		resultMany, err := t.c.InsertMany(ctx, townsInterface)
-		if err != nil {
-			return nil, err
-		}
-
-		var ids []string
-		for _, id := range resultMany.InsertedIDs {
-			ids = append(ids, fmt.Sprintf("%v", id))
-		}
-
-		return ids, nil
+	var townsInterface []interface{}
+	for _, t := range towns {
+		townsInterface = append(townsInterface, t)
 	}
 
-	resultOne, err := t.c.InsertOne(ctx, towns[0])
+	resultMany, err := t.c.InsertMany(ctx, townsInterface)
 	if err != nil {
 		return nil, err
 	}
-	return []string{fmt.Sprintf("%v", resultOne.InsertedID)}, nil
+
+	var ids []string
+	for _, id := range resultMany.InsertedIDs {
+		ids = append(ids, fmt.Sprintf("%v", id))
+	}
+
+	return ids, nil
 }
 
-//func (t *TownCollection) Find()
+func (t *TownCollection) InsertOne(ctx context.Context, town Town) (string, error) {
+	resultOne, err := t.c.InsertOne(ctx, town)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%v", resultOne.InsertedID), nil
+}
+
+/*
+func (t *TownCollection) Find() []Town{
+	findOptions := options.Find()
+findOptions.SetLimit(2)
+
+var results []Town
+
+// Passing bson.D{{}} as the filter matches all documents in the collection
+cur, err := t.c.Find(context.TODO(), bson.D{{}}, findOptions)
+if err != nil {
+    log.Fatal(err)
+}
+
+// Finding multiple documents returns a cursor
+// Iterating through the cursor allows us to decode documents one at a time
+for cur.Next(context.TODO()) {
+
+    // create a value into which the single document can be decoded
+    var elem Town
+    err := cur.Decode(&elem)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    results = append(results, elem)
+}
+
+if err := cur.Err(); err != nil {
+    log.Fatal(err)
+}
+
+// Close the cursor once finished
+cur.Close(context.TODO())
+
+fmt.Printf("Found multiple documents (array of pointers): %+v\n", results)
+}
+*/
