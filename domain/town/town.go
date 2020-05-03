@@ -25,7 +25,8 @@ type Politican struct {
 }
 
 type TownCollection struct {
-	c *mongo.Collection
+	c   *mongo.Collection
+	ctx context.Context
 }
 
 var townCollection *TownCollection
@@ -43,19 +44,19 @@ func GetInstance(ctx context.Context) *TownCollection {
 
 		db := client.Database("world")
 		collection := db.Collection("towns")
-		townCollection = &TownCollection{c: collection}
+		townCollection = &TownCollection{c: collection, ctx: ctx}
 	}
 	return townCollection
 }
 
-func (t *TownCollection) InsertMany(ctx context.Context, towns []Town) ([]string, error) {
+func (t *TownCollection) InsertMany(towns []Town) ([]string, error) {
 
 	var townsInterface []interface{}
 	for _, t := range towns {
 		townsInterface = append(townsInterface, t)
 	}
 
-	resultMany, err := t.c.InsertMany(ctx, townsInterface)
+	resultMany, err := t.c.InsertMany(t.ctx, townsInterface)
 	if err != nil {
 		return nil, err
 	}
@@ -68,23 +69,23 @@ func (t *TownCollection) InsertMany(ctx context.Context, towns []Town) ([]string
 	return ids, nil
 }
 
-func (t *TownCollection) InsertOne(ctx context.Context, town Town) (string, error) {
-	resultOne, err := t.c.InsertOne(ctx, town)
+func (t *TownCollection) InsertOne(town Town) (string, error) {
+	resultOne, err := t.c.InsertOne(t.ctx, town)
 	if err != nil {
 		return "", err
 	}
 	return fmt.Sprintf("%v", resultOne.InsertedID), nil
 }
 
-func (t *TownCollection) Find(ctx context.Context) ([]Town, error) {
-	cur, err := t.c.Find(ctx, bson.D{{}}, options.Find())
+func (t *TownCollection) Find() ([]Town, error) {
+	cur, err := t.c.Find(t.ctx, bson.D{{}}, options.Find())
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(ctx)
+	defer cur.Close(t.ctx)
 
 	var results []Town
-	for cur.Next(ctx) {
+	for cur.Next(t.ctx) {
 
 		var elem Town
 		err := cur.Decode(&elem)

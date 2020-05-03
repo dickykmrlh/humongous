@@ -13,8 +13,23 @@ func main() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	c := town.GetInstance(ctx)
 
-	// insert data
-	t := []town.Town{
+	InsertTown(c)
+
+	// find all
+	towns, err := c.Find()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(towns)
+}
+
+func InsertTown(c *town.TownCollection) {
+
+	if isDataAlreadyExist(c) {
+		return
+	}
+
+	towns := []town.Town{
 		town.Town{
 			Name:       "New York",
 			Population: 22200000,
@@ -44,18 +59,22 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		id, err = c.InsertMany(ctx, t)
+		id, err = c.InsertMany(towns)
 	}()
 	wg.Wait()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(id)
+}
 
-	// find all
-	towns, err := c.Find(ctx)
-	if err != nil {
-		panic(err)
+func isDataAlreadyExist(c *town.TownCollection) bool {
+	towns, find_err := c.Find()
+	if find_err != nil {
+		panic(find_err)
 	}
-	fmt.Println(towns)
+	if towns != nil {
+		return true
+	}
+	return false
 }
