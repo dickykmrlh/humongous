@@ -73,6 +73,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// find One matching partial values using regEx
+	// options "i" = for case incensitive
+	regex := bson.M{"$regex": primitive.Regex{Pattern: "moma", Options: "i"}}
+	findOne.SetProjection(bson.D{{"name", 1}, {"famousfor", 1}})
+	town, err = c.FindOne(bson.M{"famousfor": regex}, findOne)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(town)
 
 }
