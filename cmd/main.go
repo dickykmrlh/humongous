@@ -13,6 +13,7 @@ func main() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	c := town.GetInstance(ctx)
 
+	// insert data
 	t := []town.Town{
 		town.Town{
 			Name:       "New York",
@@ -50,4 +51,11 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(id)
+
+	// find all
+	towns, err := c.Find(ctx)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(towns)
 }

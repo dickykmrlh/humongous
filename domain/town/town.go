@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -75,40 +76,28 @@ func (t *TownCollection) InsertOne(ctx context.Context, town Town) (string, erro
 	return fmt.Sprintf("%v", resultOne.InsertedID), nil
 }
 
-/*
-func (t *TownCollection) Find() []Town{
-	findOptions := options.Find()
-findOptions.SetLimit(2)
+func (t *TownCollection) Find(ctx context.Context) ([]Town, error) {
+	cur, err := t.c.Find(ctx, bson.D{{}}, options.Find())
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
 
-var results []Town
+	var results []Town
+	for cur.Next(ctx) {
 
-// Passing bson.D{{}} as the filter matches all documents in the collection
-cur, err := t.c.Find(context.TODO(), bson.D{{}}, findOptions)
-if err != nil {
-    log.Fatal(err)
+		var elem Town
+		err := cur.Decode(&elem)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, elem)
+	}
+
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
-
-// Finding multiple documents returns a cursor
-// Iterating through the cursor allows us to decode documents one at a time
-for cur.Next(context.TODO()) {
-
-    // create a value into which the single document can be decoded
-    var elem Town
-    err := cur.Decode(&elem)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    results = append(results, elem)
-}
-
-if err := cur.Err(); err != nil {
-    log.Fatal(err)
-}
-
-// Close the cursor once finished
-cur.Close(context.TODO())
-
-fmt.Printf("Found multiple documents (array of pointers): %+v\n", results)
-}
-*/
