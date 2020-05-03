@@ -2,7 +2,6 @@ package town
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,26 +24,16 @@ type Politican struct {
 }
 
 type TownCollection struct {
-	c   *mongo.Collection
-	ctx context.Context
+	collection *mongo.Collection
+	ctx        context.Context
 }
 
 var townCollection *TownCollection
 
-func GetInstance(ctx context.Context) *TownCollection {
+func GetInstance(ctx context.Context, db *mongo.Database) *TownCollection {
 	if townCollection == nil {
-		client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = client.Connect(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		db := client.Database("world")
 		collection := db.Collection("towns")
-		townCollection = &TownCollection{c: collection, ctx: ctx}
+		townCollection = &TownCollection{collection: collection, ctx: ctx}
 	}
 	return townCollection
 }
@@ -56,7 +45,7 @@ func (t *TownCollection) InsertMany(towns []Town) ([]string, error) {
 		townsInterface = append(townsInterface, t)
 	}
 
-	result, err := t.c.InsertMany(t.ctx, townsInterface)
+	result, err := t.collection.InsertMany(t.ctx, townsInterface)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +60,7 @@ func (t *TownCollection) InsertMany(towns []Town) ([]string, error) {
 }
 
 func (t *TownCollection) InsertOne(town Town) (string, error) {
-	result, err := t.c.InsertOne(t.ctx, town)
+	result, err := t.collection.InsertOne(t.ctx, town)
 	if err != nil {
 		return "", err
 	}
@@ -80,12 +69,11 @@ func (t *TownCollection) InsertOne(town Town) (string, error) {
 }
 
 func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
-	cur, err := t.c.Find(t.ctx, bson.M{}, opt)
+	cur, err := t.collection.Find(t.ctx, bson.M{}, opt)
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(t.ctx)
-
 	var results []Town
 	for cur.Next(t.ctx) {
 
@@ -107,7 +95,7 @@ func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
 
 func (t *TownCollection) FindOne(filter interface{}, opt *options.FindOneOptions) (Town, error) {
 	var result Town
-	err := t.c.FindOne(t.ctx, filter, opt).Decode(&result)
+	err := t.collection.FindOne(t.ctx, filter, opt).Decode(&result)
 	if err != nil {
 		return Town{}, err
 	}

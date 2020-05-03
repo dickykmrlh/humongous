@@ -12,6 +12,7 @@ import (
 )
 
 func PlayAroundWithTown(townCollection *town.TownCollection) {
+	fmt.Println("###################################################################################")
 	ids, err := InsertTown(townCollection)
 	if err != nil {
 		panic(err)
@@ -79,6 +80,8 @@ func PlayAroundWithTown(townCollection *town.TownCollection) {
 		panic(err)
 	}
 	fmt.Println(town)
+	fmt.Println()
+	fmt.Println("###################################################################################")
 }
 
 func InsertTown(townCollection *town.TownCollection) (ids []string, err error) {
@@ -125,8 +128,8 @@ func InsertTown(townCollection *town.TownCollection) (ids []string, err error) {
 	return
 }
 
-func isDocumentAlreadyExist(c *town.TownCollection) bool {
-	towns, find_err := c.Find(options.Find())
+func isDocumentAlreadyExist(townCollection *town.TownCollection) bool {
+	towns, find_err := townCollection.Find(options.Find())
 	if find_err != nil {
 		panic(find_err)
 	}
