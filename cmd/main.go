@@ -45,11 +45,22 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	town, err := c.FindOne(bson.D{{"_id", objID}})
+
+	findOne := options.FindOne()
+	town, err := c.FindOne(bson.D{{"_id", objID}}, findOne)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(town)
+
+	// find One with object ID and return Name of the city only
+	findOne.SetProjection(bson.D{{"name", 1}})
+	town, err = c.FindOne(bson.D{{"_id", objID}}, findOne)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(town)
+
 }
 
 func InsertTown(c *town.TownCollection) (ids []string, err error) {

@@ -80,7 +80,7 @@ func (t *TownCollection) InsertOne(town Town) (string, error) {
 }
 
 func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
-	cur, err := t.c.Find(t.ctx, bson.D{{}}, opt)
+	cur, err := t.c.Find(t.ctx, bson.M{}, opt)
 	if err != nil {
 		return nil, err
 	}
@@ -105,9 +105,9 @@ func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
 	return results, nil
 }
 
-func (t *TownCollection) FindOne(filter interface{}) (Town, error) {
+func (t *TownCollection) FindOne(filter interface{}, opt *options.FindOneOptions) (Town, error) {
 	var result Town
-	err := t.c.FindOne(t.ctx, filter).Decode(&result)
+	err := t.c.FindOne(t.ctx, filter, opt).Decode(&result)
 	if err != nil {
 		return Town{}, err
 	}
