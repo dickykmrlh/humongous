@@ -13,7 +13,7 @@ import (
 
 func PlayAroundWithTown(townCollection *town.TownCollection) {
 	fmt.Println("###################################################################################")
-	ids, err := InsertTown(townCollection)
+	_, err := InsertTown(townCollection)
 	if err != nil {
 		panic(err)
 	}
@@ -37,12 +37,8 @@ func PlayAroundWithTown(townCollection *town.TownCollection) {
 	fmt.Println(towns)
 	fmt.Println("=====================================")
 
-	if ids == nil {
-		return
-	}
-
 	// find One with object ID
-	objID, err := primitive.ObjectIDFromHex(ids[1])
+	objID, err := primitive.ObjectIDFromHex("5eb60f2bba0293032d0f96bb")
 	if err != nil {
 		panic(err)
 	}
@@ -85,6 +81,24 @@ func PlayAroundWithTown(townCollection *town.TownCollection) {
 	}
 	fmt.Println(town)
 	fmt.Println()
+
+	// update document add state field
+	objID, err = primitive.ObjectIDFromHex("5eb60f2bba0293032d0f96bd")
+	if err != nil {
+		panic(err)
+	}
+
+	err = townCollection.UpdateOne(bson.M{"_id": objID}, bson.M{"$set": bson.M{"state": "OR"}})
+	if err != nil {
+		panic(err)
+	}
+
+	// Increase PortLand Population
+	err = townCollection.UpdateOne(bson.M{"_id": objID}, bson.M{"$inc": bson.M{"population": 100000}})
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Println("###################################################################################")
 }
 

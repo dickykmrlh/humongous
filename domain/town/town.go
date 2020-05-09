@@ -16,6 +16,7 @@ type Town struct {
 	LastCensus time.Time
 	FamousFor  []string
 	Mayor      Politican
+	State      string
 }
 
 type Politican struct {
@@ -100,4 +101,12 @@ func (t *TownCollection) FindOne(filter interface{}, opt *options.FindOneOptions
 		return Town{}, err
 	}
 	return result, nil
+}
+
+func (t *TownCollection) UpdateOne(filter interface{}, update interface{}) error {
+	_, err := t.collection.UpdateOne(t.ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
