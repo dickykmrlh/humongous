@@ -98,7 +98,6 @@ func PlayAroundWithTown(townCollection *town.TownCollection) {
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Println("###################################################################################")
 }
 

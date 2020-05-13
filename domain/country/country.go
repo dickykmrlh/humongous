@@ -61,8 +61,8 @@ func (c *CountriesCollection) InsertOne(country Country) error {
 	return nil
 }
 
-func (c *CountriesCollection) Find(filter interface{}, opt *options.FindOptions) ([]Country, error) {
-	cur, err := c.collection.Find(c.ctx, filter, opt)
+func (c *CountriesCollection) Find(filter interface{}, opts ...*options.FindOptions) ([]Country, error) {
+	cur, err := c.collection.Find(c.ctx, filter, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,4 +75,12 @@ func (c *CountriesCollection) Find(filter interface{}, opt *options.FindOptions)
 	}
 
 	return results, nil
+}
+
+func (c *CountriesCollection) Remove(filter interface{}) (int, error) {
+	deleteResult, err := c.collection.DeleteMany(c.ctx, filter)
+	if err != nil {
+		return 0, err
+	}
+	return int(deleteResult.DeletedCount), nil
 }

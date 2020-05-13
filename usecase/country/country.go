@@ -48,6 +48,21 @@ func PlayAroundWithCountry(countriesCollection *country.CountriesCollection) {
 	fmt.Println()
 	fmt.Println("###################################################################################")
 
+	// remove with bad bacon
+	removedCount, err := countriesCollection.Remove(bson.M{
+		"exports.foods": bson.M{
+			"$elemMatch": bson.M{
+				"name":  "bacon",
+				"tasty": false,
+			},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(removedCount)
+	fmt.Println()
+	fmt.Println("###################################################################################")
 }
 
 func InsertTown(countriesCollection *country.CountriesCollection) error {
