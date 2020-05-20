@@ -76,15 +76,8 @@ func (t *TownCollection) Find(opt *options.FindOptions) ([]Town, error) {
 	}
 	defer cur.Close(t.ctx)
 	var results []Town
-	for cur.Next(t.ctx) {
-
-		var elem Town
-		err := cur.Decode(&elem)
-		if err != nil {
-			return nil, err
-		}
-
-		results = append(results, elem)
+	if err = cur.All(t.ctx, &results); err != nil {
+		return results, err
 	}
 
 	if err := cur.Err(); err != nil {

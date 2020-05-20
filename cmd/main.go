@@ -2,22 +2,16 @@ package main
 
 import (
 	"context"
-	"log"
-	"time"
-
-	//"github.com/dickymrlh/humongous/domain/town"
-
-	//t "github.com/dickymrlh/humongous/usecase/town"
-	//"go.mongodb.org/mongo-driver/mongo"
-	//"go.mongodb.org/mongo-driver/mongo/options"
-	"github.com/dickymrlh/humongous/domain/phone"
-	p "github.com/dickymrlh/humongous/usecase/phone"
+	"github.com/dickymrlh/humongous/domain/city"
+	city2 "github.com/dickymrlh/humongous/usecase/city"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"time"
 )
 
 func main() {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Minute)
+	ctx, _ := context.WithTimeout(context.Background(), 5 * time.Second)
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
 	if err != nil {
 		log.Fatal(err)
@@ -28,10 +22,6 @@ func main() {
 	}
 	db := client.Database("world")
 
-	phoneCollection := phone.GetInstance(ctx, db)
-	p.PlayAroundWithPhone(phoneCollection)
-	//townCollection := town.GetInstance(ctx, db)
-	//t.PlayAroundWithTown(townCollection)
-	//countriesCollection := country.GetInstance(ctx, db)
-	//c.PlayAroundWithCountry(countriesCollection)
+	collection := city.GetInstance(ctx, db)
+	city2.PlayAroundWithTownAggregate(collection)
 }

@@ -30,6 +30,7 @@ func PlayAroundWithTown(townCollection *town.TownCollection) {
 	// find with limit and sort
 	opt.SetLimit(2)
 	opt.SetSort(bson.D{{"population", 1}})
+
 	towns, err = townCollection.Find(opt)
 	if err != nil {
 		panic(err)

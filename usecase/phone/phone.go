@@ -8,7 +8,7 @@ import (
 )
 
 func PlayAroundWithPhone(pc *phone.PhoneCollection) {
-	populatePhones(800, 5550000, 5650000, pc)
+	populatePhones(900, 6150000, 6250000, pc)
 }
 
 func populatePhones(area, start, stop int, pc *phone.PhoneCollection) {
